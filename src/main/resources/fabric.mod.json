@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "client-side_custom_music_disc_fix",
+  "version": "${version}",
+  "name": "Client-side Custom Music Disc Fix",
+  "description": "A client-side mod to fix MC-260346",
+  "authors": [
+    "AlphaDS"
+  ],
+  "contact": {},
+  "license": "GPL-3.0",
+  "icon": "assets/client-side_custom_music_disc_fix/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.alphads.clientside_custom_music_disc_fix.ClientSideCustomMusicDiscFix"
+    ],
+    "modmenu": [
+      "dev.alphads.clientside_custom_music_disc_fix.config.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "client-side_custom_music_disc_fix.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
