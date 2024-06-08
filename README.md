@@ -7,8 +7,8 @@ A simple client-side mod that fixes [MC-260346](https://bugs.mojang.com/browse/M
 ## Features
 - Play a custom music disc at its full length
 - Stop a custom music disc while it is playing
-- Simulate hopper support on the client
-- Synchronize jukebox particles with the client's music
+- Simulate hopper support for the jukebox on the client
+- Synchronize jukebox particles with the client
 
 ![Config Options as of v1.0.0](assets/images/config.png)
 
@@ -16,12 +16,12 @@ A simple client-side mod that fixes [MC-260346](https://bugs.mojang.com/browse/M
 [Fabric Loader](https://fabricmc.net/) and [Fabric API](https://modrinth.com/mod/fabric-api) are required. If you want to access configurations in-game, you can also install [Cloth Config](https://modrinth.com/mod/cloth-config) and [Mod Menu](https://modrinth.com/mod/modmenu).
 
 ## Resource Pack Format
-The file name of your music file must be the same as the vanilla disc you are replacing. You can follow this [YouTube video](https://www.youtube.com/watch?v=yVq8O1Ie0hE) or the [wiki] for a step-by-step tutorial.
+The file name of your music file must be the same as the vanilla disc you are replacing. You can follow this [YouTube video](https://www.youtube.com/watch?v=yVq8O1Ie0hE) or the [wiki](https://github.com/Alpha-DS/Client-side-Custom-Music-Disc-Fix/wiki) for a step-by-step tutorial.
 
 Resource pack samples/templates are available [here](assets/templates).
 
 ## Technical Information, Configuration Options and Known Issues
-Check out the [wiki] and [issues] page for more info.
+Check out the [wiki](https://github.com/Alpha-DS/Client-side-Custom-Music-Disc-Fix/wiki) and [issues](https://github.com/Alpha-DS/Client-side-Custom-Music-Disc-Fix/issues) pages for more info.
 
 ## External Links
 [Modrinth](https://modrinth.com/project/client-side-custom-music-disc-fix)<br>
