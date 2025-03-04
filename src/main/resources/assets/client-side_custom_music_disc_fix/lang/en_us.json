@@ -10,7 +10,7 @@
   "config.client_side_custom_music_disc_fix.stopWhenJukeboxBreaks.tooltip": "Stops the music if a jukebox breaks at the music's location",
 
   "config.client_side_custom_music_disc_fix.syncJukeboxParticles": "Synchronize Jukebox Particles",
-  "config.client_side_custom_music_disc_fix.syncJukeboxParticles.tooltip": "Jukebox articles will synchronize with the client instead of the server",
+  "config.client_side_custom_music_disc_fix.syncJukeboxParticles.tooltip": "Jukebox particles will synchronize with the client instead of the server",
 
   "config.client_side_custom_music_disc_fix.simulateJukeboxHopper": "Simulate Hopper Support",
   "config.client_side_custom_music_disc_fix.simulateJukeboxHopper.tooltip": "Simulates hopper support for jukeboxes on the client for music playback"

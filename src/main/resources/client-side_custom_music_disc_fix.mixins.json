@@ -8,8 +8,10 @@
   "client": [
     "ClientPlayNetworkHandlerMixin",
     "SoundSystemMixin",
+    "WorldEventHandlerMixin",
     "WorldRendererMixin",
-    "accessors.PlayingSongsAccessor"
+    "accessors.PlayingSongsAccessor",
+    "accessors.WorldEventHandlerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

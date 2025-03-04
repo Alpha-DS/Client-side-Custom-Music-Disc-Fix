@@ -2,20 +2,23 @@ package dev.alphads.clientside_custom_music_disc_fix.mixin;
 
 import dev.alphads.clientside_custom_music_disc_fix.config.Config;
 import dev.alphads.clientside_custom_music_disc_fix.managers.JukeboxParticleManager;
+import dev.alphads.clientside_custom_music_disc_fix.mixin.accessors.PlayingSongsAccessor;
 import dev.alphads.clientside_custom_music_disc_fix.managers.JukeboxHopperPlaylistManager;
-import dev.alphads.clientside_custom_music_disc_fix.utils.PlayingSongsGetter;
-import net.minecraft.block.jukebox.JukeboxSong;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.MusicDiscItem;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.TagKey;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,6 +30,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public abstract class ClientPlayNetworkHandlerMixin {
+    @Unique
+    private final TagKey<Item> MUSIC_DISC_TAG = TagKey.of(Registries.ITEM.getKey(), new Identifier("minecraft", "music_discs"));
 
     /** This method removes the music disc sound instance from the playing songs list when the music disc
      *  is dropped from the jukebox. This is detected on the client side using the music disc item entity.
@@ -39,26 +44,29 @@ public abstract class ClientPlayNetworkHandlerMixin {
             return;
         }
         if (entity instanceof ItemEntity itemEntity) {
-            if (itemEntity.getStack().getComponents().get(DataComponentTypes.JUKEBOX_PLAYABLE) != null) {
+            if (itemEntity.getStack().isIn(MUSIC_DISC_TAG)) {
                 BlockPos jukeboxPos = calcJukeboxPos(itemEntity);
                 // If the music disc coordinates are within a jukebox's dropping range
                 if (jukeboxPos != null) {
-                    SoundInstance currentSong = PlayingSongsGetter.getPlayingSongs().get(jukeboxPos);
+                    SoundInstance currentSong = ((PlayingSongsAccessor) MinecraftClient.getInstance().worldRenderer).getPlayingSongs().get(jukeboxPos);
                     // If the jukeboxPos has a song playing
                     if (currentSong != null) {
                         MinecraftClient.getInstance().getSoundManager().stop(currentSong);
-                        PlayingSongsGetter.getPlayingSongs().remove(jukeboxPos);
+                        ((PlayingSongsAccessor) MinecraftClient.getInstance().worldRenderer).getPlayingSongs().remove(jukeboxPos);
                         if (Config.getConfigOption(Config.ConfigKeys.SYNC_JUKEBOX_PARTICLES)) {
                             JukeboxParticleManager.removeParticleLocation(jukeboxPos);
                         }
                         if (Config.getConfigOption(Config.ConfigKeys.SIMULATE_JUKEBOX_HOPPER)) {
                             // Play the next song in the playlist
-                            RegistryEntry<JukeboxSong> nextSong = JukeboxHopperPlaylistManager.getSongFromPlaylist(jukeboxPos);
+                            SoundEvent nextSong = JukeboxHopperPlaylistManager.getSongFromPlaylist(jukeboxPos);
                             if (nextSong != null) {
-                                MinecraftClient.getInstance().inGameHud.setRecordPlayingOverlay(nextSong.value().description());
-                                SoundInstance songInstance = PositionedSoundInstance.record(nextSong.value().soundEvent().value(), Vec3d.ofCenter(jukeboxPos));
+                                MusicDiscItem musicDiscItem = MusicDiscItem.bySound(nextSong);
+                                if (musicDiscItem != null) {
+                                    MinecraftClient.getInstance().inGameHud.setRecordPlayingOverlay(musicDiscItem.getDescription());
+                                }
+                                SoundInstance songInstance = PositionedSoundInstance.record(nextSong, Vec3d.ofCenter(jukeboxPos));
                                 MinecraftClient.getInstance().getSoundManager().play(songInstance);
-                                PlayingSongsGetter.getPlayingSongs().put(jukeboxPos, songInstance);
+                                ((PlayingSongsAccessor) MinecraftClient.getInstance().worldRenderer).getPlayingSongs().put(jukeboxPos, songInstance);
                                 if (Config.getConfigOption(Config.ConfigKeys.SYNC_JUKEBOX_PARTICLES)) {
                                     JukeboxParticleManager.addParticleLocation(jukeboxPos);
                                 }
@@ -82,7 +90,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
         if(Config.getConfigOption(Config.ConfigKeys.SYNC_JUKEBOX_PARTICLES)){
             if(packet.getParameters() == ParticleTypes.NOTE){
                 BlockPos jukeboxPos = calcParticlePos(packet.getX(), packet.getY(), packet.getZ());
-                SoundInstance currentSong = PlayingSongsGetter.getPlayingSongs().get(jukeboxPos);
+                SoundInstance currentSong = ((PlayingSongsAccessor) MinecraftClient.getInstance().worldRenderer).getPlayingSongs().get(jukeboxPos);
                 if(currentSong != null){
                     JukeboxParticleManager.addParticleLocation(jukeboxPos);
                 }

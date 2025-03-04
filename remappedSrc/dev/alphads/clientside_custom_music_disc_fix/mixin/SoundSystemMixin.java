@@ -2,12 +2,12 @@ package dev.alphads.clientside_custom_music_disc_fix.mixin;
 
 import dev.alphads.clientside_custom_music_disc_fix.config.Config;
 import dev.alphads.clientside_custom_music_disc_fix.managers.JukeboxParticleManager;
+import dev.alphads.clientside_custom_music_disc_fix.mixin.accessors.PlayingSongsAccessor;
 import dev.alphads.clientside_custom_music_disc_fix.managers.JukeboxHopperPlaylistManager;
-import dev.alphads.clientside_custom_music_disc_fix.utils.PlayingSongsGetter;
-import net.minecraft.block.jukebox.JukeboxSong;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.*;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.item.MusicDiscItem;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,7 +39,7 @@ public abstract class SoundSystemMixin {
         String soundId = soundInstance.getId().toString();
         for (String musicDiscName : MUSIC_DISC_NAMES) {
             if (soundId.equals("minecraft:music_disc." + musicDiscName)) {
-                Map<BlockPos, SoundInstance> playingSongs = PlayingSongsGetter.getPlayingSongs();
+                Map<BlockPos, SoundInstance> playingSongs = ((PlayingSongsAccessor) MinecraftClient.getInstance().worldRenderer).getPlayingSongs();
                     if(playingSongs.containsValue(soundInstance)){
                         BlockPos soundPosition = new BlockPos((int)Math.floor(soundInstance.getX()), (int)Math.floor(soundInstance.getY()), (int)Math.floor(soundInstance.getZ()));
                         playingSongs.remove(soundPosition);
@@ -48,10 +48,13 @@ public abstract class SoundSystemMixin {
                         }
                         // If simulate jukebox hopper is enabled, play the next song in the playlist. Clear the playlist otherwise
                         if (Config.getConfigOption(Config.ConfigKeys.SIMULATE_JUKEBOX_HOPPER)) {
-                            RegistryEntry<JukeboxSong> nextSong = JukeboxHopperPlaylistManager.getSongFromPlaylist(soundPosition);
+                            SoundEvent nextSong = JukeboxHopperPlaylistManager.getSongFromPlaylist(soundPosition);
                             if (nextSong != null) {
-                                MinecraftClient.getInstance().inGameHud.setRecordPlayingOverlay(nextSong.value().description());
-                                SoundInstance songInstance = PositionedSoundInstance.record(nextSong.value().soundEvent().value(), Vec3d.ofCenter(soundPosition));
+                                MusicDiscItem musicDiscItem = MusicDiscItem.bySound(nextSong);
+                                if (musicDiscItem != null) {
+                                    MinecraftClient.getInstance().inGameHud.setRecordPlayingOverlay(musicDiscItem.getDescription());
+                                }
+                                SoundInstance songInstance = PositionedSoundInstance.record(nextSong, Vec3d.ofCenter(soundPosition));
                                 // Deferring the play call to the end of the tick method to avoid ConcurrentModificationException
                                 songsToPlay.add(songInstance);
                                 playingSongs.put(soundPosition, songInstance);
