@@ -20,7 +20,7 @@ A simple client-side mod that fixes [MC-260346](https://bugs.mojang.com/browse/M
 The file name of your music file must be the same as the vanilla disc you are replacing. You can follow this [YouTube video](https://www.youtube.com/watch?v=yVq8O1Ie0hE) or other online sources.
 
 ## Technical Information, Configuration Options and Known Issues
-Check out the [wiki] and [issues] page for more info.
+Check out the [wiki](https://github.com/Alpha-DS/Client-side-Custom-Music-Disc-Fix/wiki) and [issues](https://github.com/Alpha-DS/Client-side-Custom-Music-Disc-Fix/issues) pages for more info.
 
 ## External Links
 [Modrinth](https://modrinth.com/project/client-side-custom-music-disc-fix)<br>
@@ -28,3 +28,4 @@ Check out the [wiki] and [issues] page for more info.
 [Ko-fi](https://ko-fi.com/alphads)
 
 If you have any questions or issues, please send an email to `alphadsmrt@gmail.com` (with your Discord username if you prefer).
+
