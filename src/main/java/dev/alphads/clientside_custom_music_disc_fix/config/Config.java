@@ -42,7 +42,7 @@ public class Config {
         try (FileWriter writer = new FileWriter(CONFIG_FILE_PATH.toFile())) {
             gson.toJson(DEFAULT_CONFIG_OPTIONS, writer);
         } catch (IOException e) {
-            LOGGER.error("Failed to generate default config file: {}. Using default config values.", e.getMessage());
+            LOGGER.warn("Failed to generate default config file: {}. Using default config values.", e.getMessage());
         }
     }
 
@@ -51,7 +51,7 @@ public class Config {
             Gson gson = new Gson();
             configOptions = new ConfigOptions(gson.fromJson(reader, ConfigOptions.class));
         } catch (IOException | JsonSyntaxException e) {
-            LOGGER.error("Failed to read config file: {}. Using default config values.", e.getMessage());
+            LOGGER.warn("Failed to read config file: {}. Using default config values.", e.getMessage());
             configOptions = new ConfigOptions(DEFAULT_CONFIG_OPTIONS);
         }
     }
@@ -60,7 +60,7 @@ public class Config {
         // Check for missing config options
         for (Map.Entry<String, Boolean> entry : DEFAULT_CONFIG_OPTIONS.options.entrySet()) {
             if (!configOptions.options.containsKey(entry.getKey())) {
-                LOGGER.error("Missing config option: {}. Using default value: {}", entry.getKey(), entry.getValue());
+                LOGGER.warn("Missing config option: {}. Using default value: {}", entry.getKey(), entry.getValue());
                 configOptions.options.put(entry.getKey(), entry.getValue());
             }
         }
@@ -80,7 +80,7 @@ public class Config {
         try (FileWriter writer = new FileWriter(CONFIG_FILE_PATH.toFile())) {
             gson.toJson(configOptions, writer);
         } catch (IOException e) {
-            LOGGER.error("Failed to save config file: {}", e.getMessage());
+            LOGGER.warn("Failed to save config file: {}", e.getMessage());
         }
     }
 
@@ -96,7 +96,7 @@ public class Config {
         if (configOptions.options.containsKey(option)) {
             configOptions.options.put(option, value);
         } else {
-            LOGGER.error("Unknown config option: {}. Value is unchanged.", option);
+            LOGGER.warn("Unknown config option: {}. Value is unchanged.", option);
         }
     }
 
@@ -105,6 +105,7 @@ public class Config {
         public static final String STOP_WHEN_JUKEBOX_BREAKS = "stopWhenJukeboxBreaks";
         public static final String SYNC_JUKEBOX_PARTICLES = "syncJukeboxParticles";
         public static final String SIMULATE_JUKEBOX_HOPPER = "simulateJukeboxHopper";
+        public static final String DISABLE_DISC_ATTENUATION = "disableDiscAttenuation";
 
         // Add text for each config option
         public static final Map<String, Text> CONFIG_LABELS = new HashMap<>();
@@ -113,6 +114,7 @@ public class Config {
             CONFIG_LABELS.put(STOP_WHEN_JUKEBOX_BREAKS, Text.translatable("config.client_side_custom_music_disc_fix.stopWhenJukeboxBreaks"));
             CONFIG_LABELS.put(SYNC_JUKEBOX_PARTICLES, Text.translatable("config.client_side_custom_music_disc_fix.syncJukeboxParticles"));
             CONFIG_LABELS.put(SIMULATE_JUKEBOX_HOPPER, Text.translatable("config.client_side_custom_music_disc_fix.simulateJukeboxHopper"));
+            CONFIG_LABELS.put(DISABLE_DISC_ATTENUATION, Text.translatable("config.client_side_custom_music_disc_fix.disableDiscAttenuation"));
         }
 
         // Add tooltips for each config option
@@ -122,6 +124,7 @@ public class Config {
             CONFIG_TOOLTIPS.put(STOP_WHEN_JUKEBOX_BREAKS, Text.translatable("config.client_side_custom_music_disc_fix.stopWhenJukeboxBreaks.tooltip"));
             CONFIG_TOOLTIPS.put(SYNC_JUKEBOX_PARTICLES, Text.translatable("config.client_side_custom_music_disc_fix.syncJukeboxParticles.tooltip"));
             CONFIG_TOOLTIPS.put(SIMULATE_JUKEBOX_HOPPER, Text.translatable("config.client_side_custom_music_disc_fix.simulateJukeboxHopper.tooltip"));
+            CONFIG_TOOLTIPS.put(DISABLE_DISC_ATTENUATION, Text.translatable("config.client_side_custom_music_disc_fix.disableDiscAttenuation.tooltip"));
         }
 
         private ConfigKeys() {
@@ -138,6 +141,7 @@ public class Config {
             options.put(ConfigKeys.STOP_WHEN_JUKEBOX_BREAKS, true);
             options.put(ConfigKeys.SYNC_JUKEBOX_PARTICLES, true);
             options.put(ConfigKeys.SIMULATE_JUKEBOX_HOPPER, true);
+            options.put(ConfigKeys.DISABLE_DISC_ATTENUATION, false);
         }
 
         @Contract(pure = true)
