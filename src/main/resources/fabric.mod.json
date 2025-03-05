@@ -7,7 +7,12 @@
   "authors": [
     "AlphaDS"
   ],
-  "contact": {},
+  "contact": {
+    "email": "alphadsmrt@gmail.com",
+    "homepage": "https://modrinth.com/mod/client-side-custom-music-disc-fix",
+    "sources": "https://github.com/Alpha-DS/Client-side-Custom-Music-Disc-Fix",
+    "issues": "https://github.com/Alpha-DS/Client-side-Custom-Music-Disc-Fix/issues"
+  },
   "license": "GPL-3.0",
   "icon": "assets/client-side_custom_music_disc_fix/icon.png",
   "environment": "client",
