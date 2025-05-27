@@ -19,8 +19,6 @@ public class JukeboxParticleManager {
     private static final float speed = 1;
     private static final double velocityY = speed * offsetY;
     private static final double velocityZ = speed * offsetZ;
-    private static final boolean force = false;
-    private static final boolean important = false;
     private static final ParticleEffect parameters = ParticleTypes.NOTE;
     public static final double BLOCKPOS_Y_OFFSET = 1.2F;
     private static final MinecraftClient client = MinecraftClient.getInstance();
@@ -57,7 +55,7 @@ public class JukeboxParticleManager {
                 // Simulate randomness in the particle's speed
                 float random = (float)client.world.getRandom().nextInt(4) / 24.0F;
                 double velocityX = speed * random;
-                client.world.addParticle(parameters, force, important, pos.getX(), pos.getY(), pos.getZ(), velocityX, velocityY, velocityZ);
+                client.world.addParticleClient(parameters, pos.getX(), pos.getY(), pos.getZ(), velocityX, velocityY, velocityZ);
             }
         }
     }
