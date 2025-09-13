@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public abstract class SoundSystemMixin {
      */
 
     @Inject(method = "tick()V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/sound/SoundSystem;soundEndTicks:Ljava/util/Map;", ordinal = 1), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void tickMixin(CallbackInfo ci, Iterator<TickableSoundInstance> iterator, Map.Entry<SoundInstance, Channel.SourceManager> entry, Channel.SourceManager sourceManager2, SoundInstance soundInstance, float h) {
+    private void tickMixin(CallbackInfo ci, Iterator<TickableSoundInstance> iterator, Map.Entry<SoundInstance, Channel.SourceManager> entry, Channel.SourceManager sourceManager2, SoundInstance soundInstance) {
         Map<BlockPos, SoundInstance> playingSongs = PlayingSongsGetter.getPlayingSongs();
         if(playingSongs.containsValue(soundInstance)){
             BlockPos soundPosition = new BlockPos((int)Math.floor(soundInstance.getX()), (int)Math.floor(soundInstance.getY()), (int)Math.floor(soundInstance.getZ()));
@@ -75,21 +76,21 @@ public abstract class SoundSystemMixin {
     @Unique
     private static Boolean shouldModify = false;
 
-    @Inject(method = "play(Lnet/minecraft/client/sound/SoundInstance;)V", at = @At("HEAD"))
-    private void playMixin(SoundInstance sound, CallbackInfo ci) {
+    @Inject(method = "play(Lnet/minecraft/client/sound/SoundInstance;)Lnet/minecraft/client/sound/SoundSystem$PlayResult;", at = @At("HEAD"))
+    private void playMixin(SoundInstance sound, CallbackInfoReturnable<SoundSystem.PlayResult> cir) {
         if (Config.getConfigOption(Config.ConfigKeys.DISABLE_DISC_ATTENUATION) && sound.getCategory() == SoundCategory.RECORDS) {
             shouldModify = true;
         }
     }
 
     // Set attenuation type to NONE
-    @ModifyVariable(method = "play(Lnet/minecraft/client/sound/SoundInstance;)V", at = @At(value = "STORE"), ordinal = 0)
+    @ModifyVariable(method = "play(Lnet/minecraft/client/sound/SoundInstance;)Lnet/minecraft/client/sound/SoundSystem$PlayResult;", at = @At(value = "STORE"), ordinal = 0)
     private SoundInstance.AttenuationType modifyAttenuationType(SoundInstance.AttenuationType attenuationType) {
         return shouldModify ? SoundInstance.AttenuationType.NONE : attenuationType;
     }
 
     // Set relative to true (disables 3D positional audio effect)
-    @ModifyVariable(method = "play(Lnet/minecraft/client/sound/SoundInstance;)V", at = @At(value = "STORE"), ordinal = 0)
+    @ModifyVariable(method = "play(Lnet/minecraft/client/sound/SoundInstance;)Lnet/minecraft/client/sound/SoundSystem$PlayResult;", at = @At(value = "STORE"), ordinal = 0)
     private boolean modifyRelative (boolean bl) {
         if (shouldModify) {
             shouldModify = false;
