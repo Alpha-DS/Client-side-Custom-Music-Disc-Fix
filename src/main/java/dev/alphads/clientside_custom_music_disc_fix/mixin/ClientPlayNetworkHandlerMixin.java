@@ -77,7 +77,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
      * <p> Performance: Called everytime a particle packet is received. </p>
      */
 
-    @Inject(method = "onParticle", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/util/thread/ThreadExecutor;)V", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "onParticle", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V", shift = At.Shift.AFTER), cancellable = true)
     private void onParticleMixin(ParticleS2CPacket packet, CallbackInfo ci){
         if(Config.getConfigOption(Config.ConfigKeys.SYNC_JUKEBOX_PARTICLES)){
             if(packet.getParameters() == ParticleTypes.NOTE){
@@ -114,12 +114,12 @@ public abstract class ClientPlayNetworkHandlerMixin {
         final double JUKEBOX_OFFSET_MIN = 0.66;
         final double JUKEBOX_OFFSET_MAX = 0.36;
         // Entity positions without the fractional part
-        int entityPosIntX = (int) Math.floor(itemEntity.getPos().getX());
-        int entityPosIntY = (int) Math.floor(itemEntity.getPos().getY());
-        int entityPosIntZ = (int) Math.floor(itemEntity.getPos().getZ());
+        int entityPosIntX = (int) Math.floor(itemEntity.getX());
+        int entityPosIntY = (int) Math.floor(itemEntity.getY());
+        int entityPosIntZ = (int) Math.floor(itemEntity.getZ());
 
         // Get fractional part of the entity's y position
-        double entityPosFracY = itemEntity.getPos().getY() - entityPosIntY;
+        double entityPosFracY = itemEntity.getY() - entityPosIntY;
 
         // Calculate the jukebox position
         if (entityPosFracY >= JUKEBOX_OFFSET_MIN && entityPosFracY < 1){
