@@ -1,8 +1,8 @@
 package dev.alphads.clientside_custom_music_disc_fix.managers;
 
-import net.minecraft.block.jukebox.JukeboxSong;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.item.JukeboxSong;
+import net.minecraft.core.Holder;
+import net.minecraft.core.BlockPos;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -12,7 +12,7 @@ import java.util.LinkedList;
 public class JukeboxHopperPlaylistManager {
     private static final HashMap<BlockPos, Playlist> playlistHashMap = new HashMap<>();
 
-    public static void addSongToPlaylist(BlockPos jukeboxPos, RegistryEntry<JukeboxSong> song) {
+    public static void addSongToPlaylist(BlockPos jukeboxPos, Holder<JukeboxSong> song) {
         if (playlistHashMap.containsKey(jukeboxPos)) {
             playlistHashMap.get(jukeboxPos).songQueue.add(song);
         } else {
@@ -20,10 +20,10 @@ public class JukeboxHopperPlaylistManager {
         }
     }
 
-    public static RegistryEntry<JukeboxSong> getSongFromPlaylist(BlockPos jukeboxPos) {
+    public static Holder<JukeboxSong> getSongFromPlaylist(BlockPos jukeboxPos) {
         if (playlistHashMap.containsKey(jukeboxPos)) {
             Playlist playlist = playlistHashMap.get(jukeboxPos);
-            RegistryEntry<JukeboxSong> song = playlist.songQueue.poll();
+            Holder<JukeboxSong> song = playlist.songQueue.poll();
             if (playlist.songQueue.isEmpty()) {
                 playlistHashMap.remove(jukeboxPos);
             }
@@ -37,9 +37,9 @@ public class JukeboxHopperPlaylistManager {
     }
 
     private static class Playlist {
-        private final LinkedList<RegistryEntry<JukeboxSong>> songQueue = new LinkedList<>();
+        private final LinkedList<Holder<JukeboxSong>> songQueue = new LinkedList<>();
 
-        public Playlist(RegistryEntry<JukeboxSong> song) {
+        public Playlist(Holder<JukeboxSong> song) {
             songQueue.add(song);
         }
     }

@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -108,23 +108,23 @@ public class Config {
         public static final String DISABLE_DISC_ATTENUATION = "disableDiscAttenuation";
 
         // Add text for each config option
-        public static final Map<String, Text> CONFIG_LABELS = new HashMap<>();
+        public static final Map<String, Component> CONFIG_LABELS = new HashMap<>();
         static {
-            CONFIG_LABELS.put(STOP_WHEN_DISC_ENTITY_SPAWNS, Text.translatable("config.client_side_custom_music_disc_fix.stopWhenDiscEntitySpawns"));
-            CONFIG_LABELS.put(STOP_WHEN_JUKEBOX_BREAKS, Text.translatable("config.client_side_custom_music_disc_fix.stopWhenJukeboxBreaks"));
-            CONFIG_LABELS.put(SYNC_JUKEBOX_PARTICLES, Text.translatable("config.client_side_custom_music_disc_fix.syncJukeboxParticles"));
-            CONFIG_LABELS.put(SIMULATE_JUKEBOX_HOPPER, Text.translatable("config.client_side_custom_music_disc_fix.simulateJukeboxHopper"));
-            CONFIG_LABELS.put(DISABLE_DISC_ATTENUATION, Text.translatable("config.client_side_custom_music_disc_fix.disableDiscAttenuation"));
+            CONFIG_LABELS.put(STOP_WHEN_DISC_ENTITY_SPAWNS, Component.translatable("config.client_side_custom_music_disc_fix.stopWhenDiscEntitySpawns"));
+            CONFIG_LABELS.put(STOP_WHEN_JUKEBOX_BREAKS, Component.translatable("config.client_side_custom_music_disc_fix.stopWhenJukeboxBreaks"));
+            CONFIG_LABELS.put(SYNC_JUKEBOX_PARTICLES, Component.translatable("config.client_side_custom_music_disc_fix.syncJukeboxParticles"));
+            CONFIG_LABELS.put(SIMULATE_JUKEBOX_HOPPER, Component.translatable("config.client_side_custom_music_disc_fix.simulateJukeboxHopper"));
+            CONFIG_LABELS.put(DISABLE_DISC_ATTENUATION, Component.translatable("config.client_side_custom_music_disc_fix.disableDiscAttenuation"));
         }
 
         // Add tooltips for each config option
-        public static final Map<String, Text> CONFIG_TOOLTIPS = new HashMap<>();
+        public static final Map<String, Component> CONFIG_TOOLTIPS = new HashMap<>();
         static {
-            CONFIG_TOOLTIPS.put(STOP_WHEN_DISC_ENTITY_SPAWNS, Text.translatable("config.client_side_custom_music_disc_fix.stopWhenDiscEntitySpawns.tooltip"));
-            CONFIG_TOOLTIPS.put(STOP_WHEN_JUKEBOX_BREAKS, Text.translatable("config.client_side_custom_music_disc_fix.stopWhenJukeboxBreaks.tooltip"));
-            CONFIG_TOOLTIPS.put(SYNC_JUKEBOX_PARTICLES, Text.translatable("config.client_side_custom_music_disc_fix.syncJukeboxParticles.tooltip"));
-            CONFIG_TOOLTIPS.put(SIMULATE_JUKEBOX_HOPPER, Text.translatable("config.client_side_custom_music_disc_fix.simulateJukeboxHopper.tooltip"));
-            CONFIG_TOOLTIPS.put(DISABLE_DISC_ATTENUATION, Text.translatable("config.client_side_custom_music_disc_fix.disableDiscAttenuation.tooltip"));
+            CONFIG_TOOLTIPS.put(STOP_WHEN_DISC_ENTITY_SPAWNS, Component.translatable("config.client_side_custom_music_disc_fix.stopWhenDiscEntitySpawns.tooltip"));
+            CONFIG_TOOLTIPS.put(STOP_WHEN_JUKEBOX_BREAKS, Component.translatable("config.client_side_custom_music_disc_fix.stopWhenJukeboxBreaks.tooltip"));
+            CONFIG_TOOLTIPS.put(SYNC_JUKEBOX_PARTICLES, Component.translatable("config.client_side_custom_music_disc_fix.syncJukeboxParticles.tooltip"));
+            CONFIG_TOOLTIPS.put(SIMULATE_JUKEBOX_HOPPER, Component.translatable("config.client_side_custom_music_disc_fix.simulateJukeboxHopper.tooltip"));
+            CONFIG_TOOLTIPS.put(DISABLE_DISC_ATTENUATION, Component.translatable("config.client_side_custom_music_disc_fix.disableDiscAttenuation.tooltip"));
         }
 
         private ConfigKeys() {

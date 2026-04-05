@@ -3,17 +3,17 @@ package dev.alphads.clientside_custom_music_disc_fix.config;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import java.util.Map;
 
 public class ConfigScreen extends Screen {
     private final ConfigBuilder configBuilder = ConfigBuilder.create();
     private final ConfigEntryBuilder entryBuilder = configBuilder.entryBuilder();
-    private final ConfigCategory generalCategory = configBuilder.getOrCreateCategory(Text.translatable("category.client-side_custom_music_disc_fix.config.general"));
+    private final ConfigCategory generalCategory = configBuilder.getOrCreateCategory(Component.translatable("category.client-side_custom_music_disc_fix.config.general"));
 
-    public ConfigScreen(Text title, Screen parent) {
+    public ConfigScreen(Component title, Screen parent) {
         super(title);
         configBuilder.setTitle(title);
         configBuilder.setParentScreen(parent);

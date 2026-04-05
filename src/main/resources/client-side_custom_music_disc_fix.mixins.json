@@ -6,12 +6,12 @@
   "mixins": [
   ],
   "client": [
-    "ClientPlayNetworkHandlerMixin",
-    "SoundSystemMixin",
-    "WorldEventHandlerMixin",
-    "WorldRendererMixin",
+    "ClientPacketListenerMixin",
+    "SoundEngineMixin",
+    "LevelEventHandlerMixin",
+    "LevelRendererMixin",
     "accessors.PlayingSongsAccessor",
-    "accessors.WorldEventHandlerAccessor"
+    "accessors.LevelEventHandlerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

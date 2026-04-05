@@ -4,20 +4,20 @@ import dev.alphads.clientside_custom_music_disc_fix.config.Config;
 import dev.alphads.clientside_custom_music_disc_fix.managers.JukeboxParticleManager;
 import dev.alphads.clientside_custom_music_disc_fix.managers.JukeboxHopperPlaylistManager;
 import dev.alphads.clientside_custom_music_disc_fix.utils.PlayingSongsGetter;
-import net.minecraft.block.jukebox.JukeboxSong;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.item.JukeboxSong;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.Holder;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,39 +25,39 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-@Mixin(ClientPlayNetworkHandler.class)
-public abstract class ClientPlayNetworkHandlerMixin {
+@Mixin(ClientPacketListener.class)
+public abstract class ClientPacketListenerMixin {
 
     /** This method removes the music disc sound instance from the playing songs list when the music disc
      *  is dropped from the jukebox. This is detected on the client side using the music disc item entity.
      * <p> Performance: Called everytime an entity tracker update packet is received. </p>
      */
 
-    @Inject(method = "onEntityTrackerUpdate", at = @At(value = "TAIL"), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void onEntityTrackerUpdateMixin(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, Entity entity) {
+    @Inject(method = "handleSetEntityData", at = @At(value = "TAIL"), locals = LocalCapture.CAPTURE_FAILSOFT)
+    private void onEntityTrackerUpdateMixin(ClientboundSetEntityDataPacket packet, CallbackInfo ci, Entity entity) {
         if(!Config.getConfigOption(Config.ConfigKeys.STOP_WHEN_DISC_ENTITY_SPAWNS)) {
             return;
         }
         if (entity instanceof ItemEntity itemEntity) {
-            if (itemEntity.getStack().getComponents().get(DataComponentTypes.JUKEBOX_PLAYABLE) != null) {
+            if (itemEntity.getItem().getComponents().get(DataComponents.JUKEBOX_PLAYABLE) != null) {
                 BlockPos jukeboxPos = calcJukeboxPos(itemEntity);
                 // If the music disc coordinates are within a jukebox's dropping range
                 if (jukeboxPos != null) {
                     SoundInstance currentSong = PlayingSongsGetter.getPlayingSongs().get(jukeboxPos);
                     // If the jukeboxPos has a song playing
                     if (currentSong != null) {
-                        MinecraftClient.getInstance().getSoundManager().stop(currentSong);
+                        Minecraft.getInstance().getSoundManager().stop(currentSong);
                         PlayingSongsGetter.getPlayingSongs().remove(jukeboxPos);
                         if (Config.getConfigOption(Config.ConfigKeys.SYNC_JUKEBOX_PARTICLES)) {
                             JukeboxParticleManager.removeParticleLocation(jukeboxPos);
                         }
                         if (Config.getConfigOption(Config.ConfigKeys.SIMULATE_JUKEBOX_HOPPER)) {
                             // Play the next song in the playlist
-                            RegistryEntry<JukeboxSong> nextSong = JukeboxHopperPlaylistManager.getSongFromPlaylist(jukeboxPos);
+                            Holder<JukeboxSong> nextSong = JukeboxHopperPlaylistManager.getSongFromPlaylist(jukeboxPos);
                             if (nextSong != null) {
-                                MinecraftClient.getInstance().inGameHud.setRecordPlayingOverlay(nextSong.value().description());
-                                SoundInstance songInstance = PositionedSoundInstance.record(nextSong.value().soundEvent().value(), Vec3d.ofCenter(jukeboxPos));
-                                MinecraftClient.getInstance().getSoundManager().play(songInstance);
+                                Minecraft.getInstance().gui.setNowPlaying(nextSong.value().description());
+                                SoundInstance songInstance = SimpleSoundInstance.forJukeboxSong(nextSong.value().soundEvent().value(), Vec3.atCenterOf(jukeboxPos));
+                                Minecraft.getInstance().getSoundManager().play(songInstance);
                                 PlayingSongsGetter.getPlayingSongs().put(jukeboxPos, songInstance);
                                 if (Config.getConfigOption(Config.ConfigKeys.SYNC_JUKEBOX_PARTICLES)) {
                                     JukeboxParticleManager.addParticleLocation(jukeboxPos);
@@ -77,10 +77,10 @@ public abstract class ClientPlayNetworkHandlerMixin {
      * <p> Performance: Called everytime a particle packet is received. </p>
      */
 
-    @Inject(method = "onParticle", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V", shift = At.Shift.AFTER), cancellable = true)
-    private void onParticleMixin(ParticleS2CPacket packet, CallbackInfo ci){
+    @Inject(method = "handleParticleEvent", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/network/PacketProcessor;)V", shift = At.Shift.AFTER), cancellable = true)
+    private void onParticleMixin(ClientboundLevelParticlesPacket packet, CallbackInfo ci){
         if(Config.getConfigOption(Config.ConfigKeys.SYNC_JUKEBOX_PARTICLES)){
-            if(packet.getParameters() == ParticleTypes.NOTE){
+            if(packet.getParticle() == ParticleTypes.NOTE){
                 BlockPos jukeboxPos = calcParticlePos(packet.getX(), packet.getY(), packet.getZ());
                 SoundInstance currentSong = PlayingSongsGetter.getPlayingSongs().get(jukeboxPos);
                 if(currentSong != null){
