@@ -7,11 +7,11 @@
   ],
   "client": [
     "ClientPacketListenerMixin",
-    "SoundEngineMixin",
     "LevelEventHandlerMixin",
-    "LevelRendererMixin",
-    "accessors.PlayingSongsAccessor",
-    "accessors.LevelEventHandlerAccessor"
+    "LevelExtractorMixin",
+    "SoundEngineMixin",
+    "accessors.LevelEventHandlerAccessor",
+    "accessors.PlayingSongsAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

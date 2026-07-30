@@ -55,7 +55,7 @@ public abstract class ClientPacketListenerMixin {
                             // Play the next song in the playlist
                             Holder<JukeboxSong> nextSong = JukeboxHopperPlaylistManager.getSongFromPlaylist(jukeboxPos);
                             if (nextSong != null) {
-                                Minecraft.getInstance().gui.setNowPlaying(nextSong.value().description());
+                                Minecraft.getInstance().gui.hud.setNowPlaying(nextSong.value().description());
                                 SoundInstance songInstance = SimpleSoundInstance.forJukeboxSong(nextSong.value().soundEvent().value(), Vec3.atCenterOf(jukeboxPos));
                                 Minecraft.getInstance().getSoundManager().play(songInstance);
                                 PlayingSongsGetter.getPlayingSongs().put(jukeboxPos, songInstance);

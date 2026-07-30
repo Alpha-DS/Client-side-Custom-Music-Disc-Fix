@@ -50,7 +50,7 @@ public abstract class SoundEngineMixin {
             if (Config.getConfigOption(Config.ConfigKeys.SIMULATE_JUKEBOX_HOPPER)) {
                 Holder<JukeboxSong> nextSong = JukeboxHopperPlaylistManager.getSongFromPlaylist(soundPosition);
                 if (nextSong != null) {
-                    Minecraft.getInstance().gui.setNowPlaying(nextSong.value().description());
+                    Minecraft.getInstance().gui.hud.setNowPlaying(nextSong.value().description());
                     SoundInstance songInstance = SimpleSoundInstance.forJukeboxSong(nextSong.value().soundEvent().value(), Vec3.atCenterOf(soundPosition));
                     // Deferring the play call to the end of the tick method to avoid ConcurrentModificationException
                     if (songsToPlay == null) {
