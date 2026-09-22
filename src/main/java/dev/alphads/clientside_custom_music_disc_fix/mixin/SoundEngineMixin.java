@@ -1,5 +1,8 @@
 package dev.alphads.clientside_custom_music_disc_fix.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.audio.Channel;
 import dev.alphads.clientside_custom_music_disc_fix.config.Config;
 import dev.alphads.clientside_custom_music_disc_fix.managers.JukeboxParticleManager;
 import dev.alphads.clientside_custom_music_disc_fix.managers.JukeboxHopperPlaylistManager;
@@ -18,7 +21,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -26,6 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Consumer;
 
 @Mixin(SoundEngine.class)
 public abstract class SoundEngineMixin {
@@ -40,8 +43,8 @@ public abstract class SoundEngineMixin {
     @Inject(method = "tickInGameSound()V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/sounds/SoundEngine;soundDeleteTime:Ljava/util/Map;", ordinal = 1, opcode = Opcodes.GETFIELD), locals = LocalCapture.CAPTURE_FAILSOFT)
     private void tickMixin(CallbackInfo ci, Iterator<Map.Entry<SoundInstance, ChannelAccess.ChannelHandle>> iterator, Map.Entry<SoundInstance, ChannelAccess.ChannelHandle> entry, ChannelAccess.ChannelHandle handle, SoundInstance instance) {
         Map<BlockPos, SoundInstance> playingSongs = PlayingSongsGetter.getPlayingSongs();
-        if(playingSongs.containsValue(instance)){
-            BlockPos soundPosition = new BlockPos((int)Math.floor(instance.getX()), (int)Math.floor(instance.getY()), (int)Math.floor(instance.getZ()));
+        if (playingSongs.containsValue(instance)) {
+            BlockPos soundPosition = new BlockPos((int) Math.floor(instance.getX()), (int) Math.floor(instance.getY()), (int) Math.floor(instance.getZ()));
             playingSongs.remove(soundPosition);
             if (Config.getConfigOption(Config.ConfigKeys.SYNC_JUKEBOX_PARTICLES)) {
                 JukeboxParticleManager.removeParticleLocation(soundPosition);
@@ -90,19 +93,18 @@ public abstract class SoundEngineMixin {
         }
     }
 
-    // Set attenuation type to NONE
-    @ModifyVariable(method = "play(Lnet/minecraft/client/resources/sounds/SoundInstance;)Lnet/minecraft/client/sounds/SoundEngine$PlayResult;", at = @At(value = "STORE"), name = "attenuation")
-    private SoundInstance.Attenuation modifyAttenuation(SoundInstance.Attenuation attenuation) {
-        return shouldModify ? SoundInstance.Attenuation.NONE : attenuation;
-    }
-
-    // Set relative to true (disables 3D positional audio effect)
-    @ModifyVariable(method = "play(Lnet/minecraft/client/resources/sounds/SoundInstance;)Lnet/minecraft/client/sounds/SoundEngine$PlayResult;", at = @At(value = "STORE"), name = "isRelative")
-    private boolean modifyRelative (boolean isRelative) {
-        if (shouldModify) {
-            shouldModify = false;
-            return true;
-        }
-        return isRelative;
+    // Disable attenuation and set the sound to relative if the config option is enabled
+    @WrapOperation(method = "play(Lnet/minecraft/client/resources/sounds/SoundInstance;)Lnet/minecraft/client/sounds/SoundEngine$PlayResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/ChannelAccess$ChannelHandle;execute(Ljava/util/function/Consumer;)V", ordinal = 0)
+    )
+    private void wrapAttenuationSetup(ChannelAccess.ChannelHandle handle, Consumer<Channel> action, Operation<Void> op) {
+        Consumer<Channel> wrapped = channel -> {
+            action.accept(channel);
+            if (shouldModify) {
+                shouldModify = false;
+                channel.disableAttenuation();
+                channel.setRelative(true);
+            }
+        };
+        op.call(handle, wrapped);
     }
 }

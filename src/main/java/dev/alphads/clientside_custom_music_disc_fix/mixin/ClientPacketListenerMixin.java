@@ -80,8 +80,8 @@ public abstract class ClientPacketListenerMixin {
     @Inject(method = "handleParticleEvent", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/network/PacketProcessor;)V", shift = At.Shift.AFTER), cancellable = true)
     private void onParticleMixin(ClientboundLevelParticlesPacket packet, CallbackInfo ci){
         if(Config.getConfigOption(Config.ConfigKeys.SYNC_JUKEBOX_PARTICLES)){
-            if(packet.getParticle() == ParticleTypes.NOTE){
-                BlockPos jukeboxPos = calcParticlePos(packet.getX(), packet.getY(), packet.getZ());
+            if(packet.particle() == ParticleTypes.NOTE){
+                BlockPos jukeboxPos = calcParticlePos(packet.x(), packet.y(), packet.z());
                 SoundInstance currentSong = PlayingSongsGetter.getPlayingSongs().get(jukeboxPos);
                 if(currentSong != null){
                     JukeboxParticleManager.addParticleLocation(jukeboxPos);
